@@ -1,7 +1,9 @@
 from fort_dump import fort_dump
 import yt
 import numpy as np
-from yt.units import parsec, Msun, gram, centimeter, second
+from yt.units import parsec, Msun, gram, centimeter, second, Kelvin
+from astropy import units as u
+from astropy import constants
 
 def yt_from_jim(fname, n_ref=8):
     """
@@ -15,14 +17,27 @@ def yt_from_jim(fname, n_ref=8):
         Higher numbers -> less noisy, lower numbers -> better resolution
     """
     umassi,utimei,udisti,npart,gt,tkin,tgrav,tterm,escap,rho,poten,x,y,z,m,h,vx,vy,vz,u,iphase = fort_dump(fname)
+    # poten = potential energy of cloud [junk]
+    # escap = fraction of unbound mass (?)
+    # gt = global time
+    # tkin = total kinetic energy [code units]
+    # tgrav = total gravitational energy [code units]
+    # tterm = total t'ermal energy [code units]
+    # u = specific internal energy [ergs/g]
 
     # Only keep the particles that are "turned on", or something like that
-    # (this is needed to remove the streaks from accreted particles that track the motion of the stars)
+    # (this is needed to remove the streaks from accreted particles that track
+    # the motion of the stars)
     keep = iphase==0
 
     ppx=x[keep]
     ppy=y[keep]
     ppz=z[keep]
+
+    ergpergram = udisti**2 / utimei**2
+    temperature = 2*ergpergram/constants.R.cgs.value*(2./3.)*u
+    # Temperatures above 1000 are ionized, therefore have smaller mean mol weight
+    temperature[temperature > 1000] /= 4.
 
     data = {'particle_position_x': ppx,
             'particle_position_y': ppy,
@@ -32,14 +47,21 @@ def yt_from_jim(fname, n_ref=8):
             'particle_velocity_z': vz[keep],
             'particle_mass': m[keep],
             'smoothing_length': h[keep],
-            'particle_temperature': u[keep],}
+            'particle_temperature': temperature[keep]*Kelvin,
+           }
 
 
-    bbox = 1.1*np.array([[min(ppx), max(ppx)], [min(ppy), max(ppy)], [min(ppz), max(ppz)]])
+    bbox = 1.1*np.array([[min(ppx), max(ppx)],
+                         [min(ppy), max(ppy)],
+                         [min(ppz), max(ppz)]])
 
-    ds = yt.load_particles(data, length_unit=udisti*centimeter,
+    ds = yt.load_particles(data,
+                           length_unit=udisti*centimeter,
                            mass_unit=umassi*gram, n_ref=n_ref,
                            velocity_unit=udisti/utimei*centimeter/second,
+                           time_unit=utimei*second,
+                           sim_time=gt*utimei*second,
+                           periodicity=(False,False,False),
                            bbox=bbox)
 
     return ds
