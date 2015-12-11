@@ -12,6 +12,10 @@ from scipy.stats import ks_2samp
 import healpy
 import string
 
+import matplotlib
+import matplotlib
+matplotlib.use('agg')
+
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
@@ -30,7 +34,8 @@ import plfit
 import moment_maps_rotate
 
 
-def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100., zmax=100.):
+def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
+            zmax=100., limitsmean=[0.,2,-2.,6.], iline=100):
     #variables for screenshots - NB imcol expects units in CODE UNITS
 
     subplots_adjust(hspace=0.1)
@@ -43,8 +48,7 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100., zmax=10
     # [xyz]minmax
 
     # pixel dimensions of images
-
-    iline=100
+    #iline=100
 
     # dimensions of plot array
 
@@ -67,7 +71,7 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100., zmax=10
     vmin=-5.
 
     # limits for mean pdf:
-    limitsmean=[0.,2,-2.,6.]
+    #limitsmean=[0.,2,-2.,6.]
 
     # lower limit for cdf column densities
     #cmflowlimit=limitsmean[0]
@@ -542,11 +546,14 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100., zmax=10
 
 if __name__ == "__main__":
 
-    params = {'/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP100': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60.},
-              '/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP150': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60.},
-              '/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP200': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60.},
-              '/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP350': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60.},
-              '/Users/adam/work/jimsims/simulation_data/run_i/RUNI180':  {'xmin':-20., 'xmax':20., 'ymin':-20., 'ymax':20.},}
+    for ii in range(3):
+        plt.close(ii)
+
+    params = {'/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP100': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60., 'limitsmean':[0.,3.,-2,2.5]},
+              '/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP150': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60., 'limitsmean':[0.,3.,-2,2.5]},
+              '/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP200': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60., 'limitsmean':[0.,3.,-2,2.5]},
+              '/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP350': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60., 'limitsmean':[0.,3.,-2,2.5]},
+              '/Users/adam/work/jimsims/simulation_data/run_i/RUNI180':  {'xmin':-20., 'xmax':20., 'ymin':-20., 'ymax':20., 'limitsmean':[0.,2,-2.,3.]},}
 
     for k,v in params.items():
         analyze(k, **v)
