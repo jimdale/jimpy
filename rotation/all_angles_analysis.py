@@ -398,11 +398,14 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     clf()
     cla()
 
-    plt.hist(diff_ang_sep*180/np.pi, color='r', histtype='step', label='Different ($p<0.05$)')
-    plt.hist(same_ang_sep*180/np.pi, color='k', histtype='step', label='Same ($p>0.05$)')
-    plt.hist((angular_separations[angular_separations>0]*180/np.pi), color='b', histtype='step', label='Total # of images')
+    bins = np.linspace(0,90,10)
+    plt.hist(diff_ang_sep*180/np.pi, color='r', histtype='step', label='Different ($p<0.05$)', bins=bins)
+    plt.hist(same_ang_sep*180/np.pi, color='k', histtype='step', label='Same ($p>0.05$)', bins=bins)
+    plt.hist((angular_separations[(angular_separations>0)&(np.isfinite(grid))]*180/np.pi),
+             color='b', histtype='step', label='Total # of images', bins=bins)
     plt.legend(loc='best')
     plt.xlabel("Angular Separation ($^{\circ}$)")
+    plt.xlim(0,90)
 
     plt.savefig('ks_vs_angsep_histograms_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
