@@ -437,7 +437,6 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
 
     plt.savefig('ks_vs_angsep_normalized_histograms_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
     assert all(total_counts_a==total_counts)
-    import ipdb; ipdb.set_trace()
 
 
     for j in range(nbins):
