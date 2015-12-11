@@ -30,7 +30,7 @@ import plfit
 import moment_maps_rotate
 
 
-def analyze(fname):
+def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100., zmax=100.):
     #variables for screenshots - NB imcol expects units in CODE UNITS
 
     subplots_adjust(hspace=0.1)
@@ -40,13 +40,7 @@ def analyze(fname):
     extfactor=1./1.67e-24/1.e21
 
     # physical limits on field-of-view
-
-    xmin=-20.
-    xmax=20.
-    ymin=-20.
-    ymax=20.
-    zmin=-100.
-    zmax=100.
+    # [xyz]minmax
 
     # pixel dimensions of images
 
@@ -548,16 +542,11 @@ def analyze(fname):
 
 if __name__ == "__main__":
 
-    #look for files to process
+    params = {'/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP100': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60.},
+              '/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP150': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60.},
+              '/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP200': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60.},
+              '/Users/adam/work/jimsims/simulation_data/ext_feedback/BTOP350': {'xmin':-60., 'xmax':60., 'ymin':-60., 'ymax':60.},
+              '/Users/adam/work/jimsims/simulation_data/run_i/RUNI180':  {'xmin':-20., 'xmax':20., 'ymin':-20., 'ymax':20.},}
 
-    diri='./'
-
-    try:
-       finfo=sys.argv[1]
-    except:
-       print 'Need filename or filename root'
-       raise IndexError
-
-    fname=os.path.expanduser(sys.argv[1])
-
-    analyze(fname)
+    for k,v in params.items():
+        analyze(k, **v)
