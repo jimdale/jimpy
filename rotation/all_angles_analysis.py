@@ -36,16 +36,8 @@ except:
    print 'Need filename or filename root'
    raise IndexError
 
-file_list=[]
-if len(sys.argv[1])==7:
-   fname=sys.argv[1]
-   file_list.append(fname)
-else:
-   fnameroot=sys.argv[1]
-   for i in os.listdir(dir):
-       if i[:4] == fnameroot:
-          file_list.append(i)
-   file_list.sort()
+file_list=[os.path.expanduser(sys.argv[1])]
+
 
 nfiles=len(file_list)
 
@@ -172,7 +164,7 @@ for ihppix in range(nhppix):
 
 #call wrapper for imcol
 
-   fnamei=diri+fname
+   fnamei=fname
 
    maps=moment_maps_rotate.imager(fnamei,xmin,xmax,ymin,ymax,zmin,zmax,logsigmax,logrange,logsigmin,angle1,angle2,angle3,iline,coldtemp,hottemp)
 
@@ -200,22 +192,22 @@ set_cmap('hot')
 nplot=0
 
 for i in range(nmaps):
-	nplot+=1
-	plt.subplot(nplotx,nploty,nplot)
+        nplot+=1
+        plt.subplot(nplotx,nploty,nplot)
 
-	moment0=moment0maps[nplot-1]
+        moment0=moment0maps[nplot-1]
 
-	imgplot=plt.imshow(moment0*extfactor,extent=extent,origin='lower',interpolation='nearest')
-#	imgplot.set_norm(normsig)
-	imgplot.set_norm(normsigav)
-		
-	plt.contour(moment0*extfactor,levels=[10.**0.5,10.**1.],colors='white')
-	
-	plt.title('Wedge '+str(i))
-	plt.xlim(xmin, xmax)
-	plt.ylim(ymin, ymax)
-	xlabel(xlab)
-	ylabel(ylab)
+        imgplot=plt.imshow(moment0+np.log10(extfactor),extent=extent,origin='lower',interpolation='nearest')
+#       imgplot.set_norm(normsig)
+        imgplot.set_norm(normsigav)
+                
+        plt.contour(moment0*extfactor,levels=[10.**0.5,10.**1.],colors='white')
+        
+        plt.title('Wedge '+str(i))
+        plt.xlim(xmin, xmax)
+        plt.ylim(ymin, ymax)
+        xlabel(xlab)
+        ylabel(ylab)
 
 cax = plt.axes([0.95, 0.1, 0.03, 0.8])
 
@@ -223,7 +215,7 @@ cax = plt.axes([0.95, 0.1, 0.03, 0.8])
 cb=plt.colorbar(imgplot, cax=cax)
 cb.set_label('Log(column density) (g cm$^{-2}$)')
 
-plt.savefig('moment0_angles_'+fname+'.png',dpi=300,bbox_inches='tight')
+plt.savefig('moment0_angles_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 clf()
 cla()
@@ -241,24 +233,24 @@ set_cmap('rainbow')
 nplot=0
 
 for i in range(nmaps):
-	nplot+=1
-	plt.subplot(nplotx,nploty,nplot)
+        nplot+=1
+        plt.subplot(nplotx,nploty,nplot)
 
-	moment1=moment1maps[nplot-1]
+        moment1=moment1maps[nplot-1]
 
-	imgplot=plt.imshow(moment1,extent=extent,origin='lower',interpolation='nearest')
-	imgplot.set_norm(normvel)
+        imgplot=plt.imshow(moment1,extent=extent,origin='lower',interpolation='nearest')
+        imgplot.set_norm(normvel)
 
-	plt.xlim(xmin, xmax)
-	plt.ylim(ymin, ymax)
-	xlabel(xlab)
-	ylabel(ylab)
+        plt.xlim(xmin, xmax)
+        plt.ylim(ymin, ymax)
+        xlabel(xlab)
+        ylabel(ylab)
 
 cax = plt.axes([0.95, 0.1, 0.03, 0.8])
 
 cb=plt.colorbar(imgplot, cax=cax)
 cb.set_label('Line-of-sight velocity (km s$^{-1}$)')
-plt.savefig('moment1_angles_'+fname+'.png',dpi=300,bbox_inches='tight')
+plt.savefig('moment1_angles_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 clf()
 cla()
@@ -272,10 +264,10 @@ cla()
 fig=plt.figure(figsize=(8,8))
 
 for i in range(nmaps):
-	pdf=ravel(moment0maps[i])
-	pdf=[log10((10.**p)*extfactor) for p in pdf]
-	pdfs.append(pdf)
-#	print pdf
+        pdf=ravel(moment0maps[i])
+        pdf=[log10((10.**p)*extfactor) for p in pdf]
+        pdfs.append(pdf)
+#       print pdf
 
 meanpdf=[]
 stdpdf=[]
@@ -284,32 +276,32 @@ cmfxs=[]
 cmfys=[]
 nbins=50
 for coldenslist in pdfs:
-	n,bins,patches=plt.hist(coldenslist,bins=nbins,range=(-3,3),log=True,histtype='step',fill=False)
-	actualns.append(n)
+        n,bins,patches=plt.hist(coldenslist,bins=nbins,range=(-3,3),log=True,histtype='step',fill=False)
+        actualns.append(n)
 # crop cdf at lower surf dense limit
-	cmf=sort(coldenslist)
-	nlist=len(coldenslist)
-	for i in range(nlist):
-		if cmf[i]>cmflowlimit:
-			cmftrim=cmf[i:]
-			ncmf=len(cmftrim)
-			break
+        cmf=sort(coldenslist)
+        nlist=len(coldenslist)
+        for i in range(nlist):
+                if cmf[i]>cmflowlimit:
+                        cmftrim=cmf[i:]
+                        ncmf=len(cmftrim)
+                        break
 
-		
-	if cmfhighlimit<0.:
-		ncmf=len(cmftrim)
-		fncmf=float(ncmf)
-		cmfxs.append(cmftrim)
-		cmfys.append((arange(ncmf))/fncmf)
-	else:
-		for j in range(ncmf):
-			cmftrim=cmftrim[:j]
-#			print i,j
-			ncmf=len(cmftrim)
-			fncmf=float(ncmf)
-			cmfxs.append(cmftrim)
-			cmfys.append((arange(ncmf))/fncmf)
-			break
+                
+        if cmfhighlimit<0.:
+                ncmf=len(cmftrim)
+                fncmf=float(ncmf)
+                cmfxs.append(cmftrim)
+                cmfys.append((arange(ncmf))/fncmf)
+        else:
+                for j in range(ncmf):
+                        cmftrim=cmftrim[:j]
+#                       print i,j
+                        ncmf=len(cmftrim)
+                        fncmf=float(ncmf)
+                        cmfxs.append(cmftrim)
+                        cmfys.append((arange(ncmf))/fncmf)
+                        break
 
 # perform KS tests of all against all
 
@@ -318,31 +310,31 @@ cla()
 fig=plt.figure(figsize=(8,8))
 
 for i in range(nmaps):
-	for j in range(nmaps):
-		if i!=j:
-			ks=ks_2samp(cmfxs[i], cmfxs[j])
-   			plt.plot(float(i+1),ks[0],'bx')
-   			print i,j,ks
+        for j in range(nmaps):
+                if i!=j:
+                        ks=ks_2samp(cmfxs[i], cmfxs[j])
+                        plt.plot(float(i+1),ks[0],'bx')
+                        print i,j,ks
    
 xlabel('Healpix wedge')
 ylabel('KS statistics')
 
-plt.savefig('ks_stats_'+fname+'.png',dpi=300,bbox_inches='tight')
+plt.savefig('ks_stats_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 clf()
 cla()
 fig=plt.figure(figsize=(8,8))
 
 for i in range(nmaps):
-	for j in range(nmaps):
-		if i!=j:
-			ks=ks_2samp(cmfxs[i], cmfxs[j])
-   			plt.plot(float(i+1),ks[1],'bx')
+        for j in range(nmaps):
+                if i!=j:
+                        ks=ks_2samp(cmfxs[i], cmfxs[j])
+                        plt.plot(float(i+1),ks[1],'bx')
    
 xlabel('Healpix wedge')
 ylabel('KS p-value')
 
-plt.savefig('ks_p-values_'+fname+'.png',dpi=300,bbox_inches='tight')
+plt.savefig('ks_p-values_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 clf()
 cla()
@@ -350,17 +342,17 @@ fig=plt.figure(figsize=(8,8))
 
 grid=zeros((nmaps,nmaps))
 for i in range(nmaps):
-	for j in range(nmaps):
-		if i<=j:
-			ks=ks_2samp(cmfxs[i], cmfxs[j])
-   			grid[i,j]=ks[1]
+        for j in range(nmaps):
+                if i<=j:
+                        ks=ks_2samp(cmfxs[i], cmfxs[j])
+                        grid[i,j]=ks[1]
    
 plt.imshow(grid,cmap='hot',interpolation='nearest',origin='lower')
 xlabel('Healpix wedge')
 ylabel('Healpix wedge')
 colorbar()
 
-plt.savefig('ks_grid_'+fname+'.png',dpi=300,bbox_inches='tight')
+plt.savefig('ks_grid_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 clf()
 cla()
@@ -387,8 +379,8 @@ for i in range(nbins):
 
 bns=[]
 for i in range(nbins):
-	bns.append(0.5*(bins[i]+bins[i+1]))
-	
+        bns.append(0.5*(bins[i]+bins[i+1]))
+        
 sh=sum(high)
 sm=sum(meanpdf)
 sl=sum(low)
@@ -409,7 +401,7 @@ ylab='log P(A$_{\\rm V}$)'
 xlabel(xlab)
 ylabel(ylab)
 axis(limitsmean)
-plt.savefig('moment0_meanpdf'+fname+'.png',dpi=300,bbox_inches='tight')
+plt.savefig('moment0_meanpdf'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 ##########################################################################################
 #
@@ -421,16 +413,16 @@ fig=plt.figure(figsize=fsize)
 
 nplot=0
 for i in range(nmaps):
-#	nplot+=1
-	plt.subplot(nplotx,nploty,nplot)
-	plt.plot(cmfxs[i],cmfys[i])
-	xlab='log A$_{\\rm V}$'
-	ylab='log P(A$_{\\rm V}$)'
-	xlabel(xlab)
-	ylabel(ylab)
-#	axis(limitsmean)
+#       nplot+=1
+#        plt.subplot(nplotx,nploty,nplot)
+        plt.plot(cmfxs[i],cmfys[i])
+        xlab='log A$_{\\rm V}$'
+        ylab='log P(A$_{\\rm V}$)'
+        xlabel(xlab)
+        ylabel(ylab)
+#       axis(limitsmean)
 
-plt.savefig('cmfs_angles'+fname+'.png',dpi=300,bbox_inches='tight')
+plt.savefig('cmfs_angles'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 ##########################################################################################
 #
@@ -442,38 +434,65 @@ fig=plt.figure(figsize=fsize)
 
 nplot=0
 for i in range(nmaps):
-	nplot+=1
-	plt.subplot(nplotx,nploty,nplot)
-	plt.plot(bns,meanpdf,'b-')
-	pdfi=actualns[i]
-	pdfi=[log10(p) for p in pdfi]
-	plt.plot(bns,pdfi,'k-')
-	xlab='log A$_{\\rm V}$'
-	ylab='log P(A$_{\\rm V}$)'
-	xlabel(xlab)
-	ylabel(ylab)
-	axis(limitsmean)
+        nplot+=1
+        plt.subplot(nplotx,nploty,nplot)
+        plt.plot(bns,meanpdf,'b-')
+        pdfi=actualns[i]
+        pdfi=[log10(p) for p in pdfi]
+        plt.plot(bns,pdfi,'k-')
+        xlab='log A$_{\\rm V}$'
+        ylab='log P(A$_{\\rm V}$)'
+        xlabel(xlab)
+        ylabel(ylab)
+        axis(limitsmean)
 
-plt.savefig('pdfs_angles'+fname+'.png',dpi=300,bbox_inches='tight')
+plt.savefig('pdfs_angles'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 
 fig=plt.figure(figsize=fsize)
 
 nplot=0
 for i in range(nmaps):
-	plt.plot(bns,meanpdf,'-')
-	pdfi=actualns[i]
-	pdfi=[log10(p) for p in pdfi]
-	plt.plot(bns,pdfi,'k-')
-	xlab='log A$_{\\rm V}$'
-	ylab='log P(A$_{\\rm V}$)'
-	xlabel(xlab)
-	ylabel(ylab)
-	axis(limitsmean)
+        plt.plot(bns,meanpdf,'-')
+        pdfi=actualns[i]
+        pdfi=[log10(p) for p in pdfi]
+        plt.plot(bns,pdfi,'k-')
+        xlab='log A$_{\\rm V}$'
+        ylab='log P(A$_{\\rm V}$)'
+        xlabel(xlab)
+        ylabel(ylab)
+        axis(limitsmean)
 
-plt.savefig('all_pdfs_angles'+fname+'.png',dpi=300,bbox_inches='tight')
+plt.savefig('all_pdfs_angles'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
+
+# https://github.com/keflavich/plfit
+import plfit
+
+ks_pl = []
+ks_ln = []
+ks_pl_nofit = []
+ks_ln_nofit = []
+
+for row in cmfxs:
+    pf = plfit.plfit(10**np.array(row))
+    pf.lognormal()
+    ks_pl.append(pf._ks_prob)
+    ks_ln.append(pf.lognormal_ksP)
+
+    pf = plfit.plfit(10**np.array(row), xmin=10**0.5)
+    pf.lognormal()
+    ks_pl_nofit.append(pf._ks_prob)
+    ks_ln_nofit.append(pf.lognormal_ksP)
+
+plt.clf()
+plt.plot(ks_pl, ks_ln, 'bo')
+plt.plot(ks_pl_nofit, ks_ln_nofit, 'ro')
+
+# plot cutoffs
+plt.plot([0.05,0.05],[0,1],'k--')
+plt.plot([0,1],[0.05,0.05],'k--')    
+plt.xlabel("Powerlaw KS Probability")
+plt.ylabel("Lognormal KS Probability")
 
 
 print 'Done!'
-
-

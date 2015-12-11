@@ -6,7 +6,7 @@ def imager(fname,xmin,xmax,ymin,ymax,zmin,zmax,logmax,logrange,logmin,ang1,ang2,
   from numpy import where
   from numpy import log10
 
-  import imcol_python_ions
+  #import imcol_python_ions
   import imcol_python_ions_vels
 
 
