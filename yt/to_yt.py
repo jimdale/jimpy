@@ -2,6 +2,8 @@ from fort_dump import fort_dump
 import yt
 import numpy as np
 from yt.units import parsec, Msun, gram, centimeter, second, Kelvin
+from yt.fields.particle_fields import add_volume_weighted_smoothed_field
+
 from astropy import units as u
 from astropy import constants
 
@@ -63,5 +65,21 @@ def yt_from_jim(fname, n_ref=8):
                            sim_time=gt*utimei*second,
                            periodicity=(False,False,False),
                            bbox=bbox)
+
+    def _temperature(field, data):
+        ret = data[('all', "particle_temperature")] * Kelvin
+        return ret.in_units('K')
+
+    ds.add_field(('gas', "Temperature"), function=_temperature,
+                 particle_type=True, units="K")
+
+    num_neighbors = 64
+    #fn = add_volume_weighted_smoothed_field('gas', "particle_position",
+    #                                        "particle_mass",
+    #                                        "smoothing_length", "density",
+    #                                        "Temperature", ds, num_neighbors)
+
+    #ds.alias(("gas", "temperature"), fn[0])
+    
 
     return ds

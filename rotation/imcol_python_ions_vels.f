@@ -53,6 +53,7 @@ cf2py intent(in,out):: blah,v1(2001,2001),v2(2001,2001)
       REAL*4 rhonew(idim),temp1,temp2
       INTEGER*1 iphasenew(idim)
       CHARACTER*100 fileident
+      INTEGER*4 first_thing
       INTEGER*8 number8
 
       CHARACTER*100 filein
@@ -83,6 +84,22 @@ c it is just the usual 3-d kernel
 
          OPEN (UNIT = 11, FILE = filein, FORM = 'unformatted',
      &convert='LITTLE_ENDIAN')
+
+         READ (11, END=20) first_thing
+
+         if (first_thing.eq.690706) then
+             rewind(11)
+         else
+             close(11)
+             OPEN (UNIT = 11, FILE = filein, FORM = 'unformatted',
+     &convert='BIG_ENDIAN')
+             READ (11, END=20) first_thing
+             if (first_thing.ne.690706) then
+                 goto 20
+             endif
+             rewind(11)
+         endif
+
 c
 c--process file dump
 c
