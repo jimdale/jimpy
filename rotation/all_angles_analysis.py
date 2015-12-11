@@ -33,6 +33,18 @@ import plfit
 
 import moment_maps_rotate
 
+def steppify(arr,isX=False):
+    """
+    *support function*
+    Converts an array to double-length for step plotting
+    """
+    if isX:
+        interval = abs(arr[1:]-arr[:-1]) / 2.0
+        newarr = np.array(list(zip(arr[:-1]-interval,arr[:-1]+interval))).ravel()
+        newarr = np.concatenate([newarr,2*[newarr[-1]+interval[-1]]])
+    else:
+        newarr = np.array(list(zip(arr,arr))).ravel()
+    return newarr
 
 def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
             zmax=100., limitsmean=[0.,2,-2.,6.], iline=100):
@@ -410,6 +422,23 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     plt.xlim(0,90)
 
     plt.savefig('ks_vs_angsep_histograms_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
+
+    clf()
+    cla()
+    diff_counts,diff_edges = np.histogram(diff_ang_sep*180/np.pi, bins=bins2)
+    same_counts,same_edges = np.histogram(same_ang_sep*180/np.pi, bins=bins2)
+    total_counts,total_edges = np.histogram((angular_separations[(angular_separations>1)&(np.isfinite(grid))]*180/np.pi),
+                                            bins=bins2)
+
+    pl.plot(steppify(diff_edges, isX=True), steppify(diff_counts/total_counts), color='r', label='Different ($p<0.05$)')
+    pl.plot(steppify(diff_edges, isX=True), steppify(same_counts/total_counts), color='b', label='Same ($p>0.05$)')
+
+    plt.legend(loc='upper left')
+    plt.xlabel("Angular Separation ($^{\circ}$)")
+    plt.ylabel("Fraction of images")
+    plt.xlim(0,90)
+
+    plt.savefig('ks_vs_angsep_normalized_histograms_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 
     for j in range(nbins):
