@@ -33,19 +33,6 @@ import plfit
 
 import moment_maps_rotate
 
-def steppify(arr,isX=False):
-    """
-    *support function*
-    Converts an array to double-length for step plotting
-    """
-    if isX:
-        interval = abs(arr[1:]-arr[:-1]) / 2.0
-        newarr = np.array(list(zip(arr[:-1]-interval,arr[:-1]+interval))).ravel()
-        newarr = np.concatenate([newarr,2*[newarr[-1]+interval[-1]]])
-    else:
-        newarr = np.array(list(zip(arr,arr))).ravel()
-    return newarr
-
 def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
             zmax=100., limitsmean=[0.,2,-2.,6.], iline=100):
     #variables for screenshots - NB imcol expects units in CODE UNITS
