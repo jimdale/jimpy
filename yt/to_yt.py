@@ -74,10 +74,10 @@ def yt_from_jim(fname, n_ref=8):
                  particle_type=True, units="K")
 
     num_neighbors = 64
-    fn = add_volume_weighted_smoothed_field('gas', "particle_position",
-                                            "particle_mass",
-                                            "smoothing_length", "density",
-                                            "Temperature", ds, num_neighbors)
+    #fn = add_volume_weighted_smoothed_field('gas', "particle_position",
+    #                                        "particle_mass",
+    #                                        "smoothing_length", "density",
+    #                                        "Temperature", ds, num_neighbors)
 
     #ds.alias(("gas", "temperature"), fn[0])
     
