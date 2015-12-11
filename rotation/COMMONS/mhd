@@ -1,0 +1,3 @@
+      REAL*8 Bevolxyz(3,imhd)
+
+      COMMON /mhd/      Bevolxyz

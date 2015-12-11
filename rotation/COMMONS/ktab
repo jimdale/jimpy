@@ -1,0 +1,4 @@
+      INTEGER nintervals 
+      DOUBLE PRECISION kerneltab(10000),dimrstep
+      
+      COMMON /ktab /nintervals,kerneltab,dimrstep

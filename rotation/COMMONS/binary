@@ -1,0 +1,6 @@
+      REAL*8 deadbound, specang, fractan, fracradial,
+     &                anglostx, anglosty, anglostz, ptmassin
+
+      COMMON /binary/ deadbound, specang, fractan, fracradial,
+     &                anglostx, anglosty, anglostz, ptmassin, 
+     &                nstop, nfastd, nreassign, naccrete, nkill

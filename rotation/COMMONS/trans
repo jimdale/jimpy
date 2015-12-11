@@ -1,0 +1,2 @@
+      COMMON /trans / frac, energc, rnorm, ibegin, iend, ichang, smooth
+      CHARACTER*1 smooth

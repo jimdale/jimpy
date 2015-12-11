@@ -1,0 +1,3 @@
+      REAL*8 rmas1, fmas2
+	
+      COMMON /bodys / fmas1, fmas2, n1, n2

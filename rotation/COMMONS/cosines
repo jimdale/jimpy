@@ -1,0 +1,3 @@
+	DOUBLE PRECISION cosfactors(10000)
+
+	COMMON /cosines/cosfactors
