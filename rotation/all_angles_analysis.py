@@ -398,11 +398,11 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     clf()
     cla()
 
-    bins = np.linspace(0,90,10)
-    plt.hist(diff_ang_sep*180/np.pi, color='r', histtype='step', label='Different ($p<0.05$)', bins=bins)
-    plt.hist(same_ang_sep*180/np.pi, color='k', histtype='step', label='Same ($p>0.05$)', bins=bins)
+    bins2 = np.linspace(0,90,10)
+    plt.hist(diff_ang_sep*180/np.pi, color='r', histtype='step', label='Different ($p<0.05$)', bins=bins2)
+    plt.hist(same_ang_sep*180/np.pi, color='k', histtype='step', label='Same ($p>0.05$)', bins=bins2)
     plt.hist((angular_separations[(angular_separations>0)&(np.isfinite(grid))]*180/np.pi),
-             color='b', histtype='step', label='Total # of images', bins=bins)
+             color='b', histtype='step', label='Total # of images', bins=bins2)
     plt.legend(loc='best')
     plt.xlabel("Angular Separation ($^{\circ}$)")
     plt.xlim(0,90)
