@@ -392,8 +392,10 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
 
     plt.savefig('ks_vs_angsep_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
-    same_ang_sep = np.concatenate([angular_separations[(grid>0.05) & (angular_separations > 0)], np.pi-angular_separations[(grid>0.05) & (angular_separations > 0)]])
-    diff_ang_sep = np.concatenate([angular_separations[(grid<0.05) & (angular_separations > 0)], np.pi-angular_separations[(grid<0.05) & (angular_separations > 0)]])
+    same_ang_sep = np.concatenate([angular_separations[(grid>0.05) & (angular_separations > 0)],
+                                   np.pi-angular_separations[(grid>0.05) & (angular_separations > 0)]])
+    diff_ang_sep = np.concatenate([angular_separations[(grid<0.05) & (angular_separations > 0)],
+                                   np.pi-angular_separations[(grid<0.05) & (angular_separations > 0)]])
 
     clf()
     cla()
@@ -401,9 +403,9 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     bins2 = np.linspace(0,90,10)
     plt.hist(diff_ang_sep*180/np.pi, color='r', histtype='step', label='Different ($p<0.05$)', bins=bins2)
     plt.hist(same_ang_sep*180/np.pi, color='k', histtype='step', label='Same ($p>0.05$)', bins=bins2)
-    plt.hist((angular_separations[(angular_separations>0)&(np.isfinite(grid))]*180/np.pi),
+    plt.hist((angular_separations[(angular_separations>1)&(np.isfinite(grid))]*180/np.pi),
              color='b', histtype='step', label='Total # of images', bins=bins2)
-    plt.legend(loc='best')
+    plt.legend(loc='upper left')
     plt.xlabel("Angular Separation ($^{\circ}$)")
     plt.xlim(0,90)
 
