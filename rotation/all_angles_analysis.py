@@ -30,7 +30,7 @@ import plfit
 import moment_maps_rotate
 
 
-def analyze(file_list):
+def analyze(fname):
     #variables for screenshots - NB imcol expects units in CODE UNITS
 
     subplots_adjust(hspace=0.1)
@@ -127,7 +127,6 @@ def analyze(file_list):
 
     extent=(xmin,xmax,ymin,ymax)
 
-    fname=file_list[0]
 
     moment0maps=[]
     moment1maps=[]
@@ -174,6 +173,8 @@ def analyze(file_list):
     ##########################################################################################
 
     fig=plt.figure(1,figsize=fsize)
+    clf()
+    cla()
 
     set_cmap('hot')
 
@@ -458,6 +459,8 @@ def analyze(file_list):
     ##########################################################################################
 
     fig=plt.figure(1,figsize=fsize)
+    clf()
+    cla()
 
     nplot=0
     for i in range(nmaps):
@@ -477,6 +480,8 @@ def analyze(file_list):
 
 
     fig=plt.figure(1,figsize=fsize)
+    clf()
+    cla()
 
     nplot=0
     for i in range(nmaps):
@@ -553,15 +558,6 @@ if __name__ == "__main__":
        print 'Need filename or filename root'
        raise IndexError
 
-    file_list=[os.path.expanduser(sys.argv[1])]
+    fname=os.path.expanduser(sys.argv[1])
 
-
-    nfiles=len(file_list)
-
-    if nfiles < 1:
-       print 'No files found to process'
-       raise IndexError
-    else:
-       print 'Processing ',nfiles,' files'
-
-    analyze(file_list)
+    analyze(fname)
