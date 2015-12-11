@@ -1,0 +1,3 @@
+      REAL*8 gt
+
+      COMMON /gtime / gt

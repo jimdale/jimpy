@@ -1,0 +1,3 @@
+      COMMON /sort  / tempsort(idim), iorig(idim), isort(idim)
+
+

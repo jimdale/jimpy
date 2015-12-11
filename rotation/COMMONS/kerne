@@ -1,0 +1,5 @@
+      REAL*8 cnormk, radkernel, part1kernel, part2kernel,
+     &  selfnormkernel, part1potenkernel, part2potenkernel
+
+      COMMON /kerne / cnormk, radkernel, part1kernel, part2kernel,
+     &	selfnormkernel, part1potenkernel, part2potenkernel

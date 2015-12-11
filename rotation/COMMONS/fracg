@@ -1,0 +1,3 @@
+      REAL*8 escap
+      
+      COMMON /fracg / escap

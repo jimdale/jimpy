@@ -1,0 +1,3 @@
+      REAL*8 ekcle(5,iradtrans), tolerance
+
+      COMMON /radtrans/ ekcle, tolerance

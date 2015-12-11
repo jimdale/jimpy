@@ -1,0 +1,11 @@
+	REAL fwx,fwy,fwz,fmom,wforcex(idim),wforcey(idim),
+     &   wforcez(idim),fvterm,fvtermcu,fmdot_const,fmdot_mass_norm,
+     &   wspinx,wspiny,wspinz
+
+        DOUBLE PRECISION cosfactors(10000)
+
+	INTEGER iwind,iwstep
+	
+	COMMON/wind/fwx,fwy,fwz,fmom,wforcex,wforcey,
+     &   wforcez,fvterm,fvtermcu,fmdot_const,fmdot_mass_norm,
+     &   wspinx,wspiny,wspinz,cosfactors,iwind,iwstep

@@ -1,0 +1,3 @@
+	CHARACTER*1 iw
+
+	COMMON/windallowed/iw

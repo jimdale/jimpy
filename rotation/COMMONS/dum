@@ -1,0 +1,4 @@
+      REAL*4 dumalpha
+
+      COMMON /dum   / dumxyzmh(5,mmax), dumvxyzu(4,idim), 
+     &		      dumalpha(idim), dumBevolxyz(3,imhd)

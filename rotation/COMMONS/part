@@ -1,0 +1,3 @@
+      REAL*8 xyzmh(5,idim), vxyzu(4,idim)
+
+      COMMON /part  / xyzmh, vxyzu, npart
