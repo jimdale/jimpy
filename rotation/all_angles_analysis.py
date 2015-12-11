@@ -404,10 +404,10 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
 
     plt.savefig('ks_vs_angsep_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
-    same_ang_sep = np.concatenate([angular_separations[(grid>0.05) & (angular_separations > 0)],
-                                   np.pi-angular_separations[(grid>0.05) & (angular_separations > 0)]])
-    diff_ang_sep = np.concatenate([angular_separations[(grid<0.05) & (angular_separations > 0)],
-                                   np.pi-angular_separations[(grid<0.05) & (angular_separations > 0)]])
+    same_ang_sep = np.concatenate([angular_separations[(grid>0.05) & (angular_separations > 0.01)],
+                                   np.pi-angular_separations[(grid>0.05) & (angular_separations > 0.01)]])
+    diff_ang_sep = np.concatenate([angular_separations[(grid<0.05) & (angular_separations > 0.01)],
+                                   np.pi-angular_separations[(grid<0.05) & (angular_separations > 0.01)]])
 
     clf()
     cla()
@@ -415,7 +415,7 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     bins2 = np.linspace(0,90,10)
     plt.hist(diff_ang_sep*180/np.pi, color='r', histtype='step', label='Different ($p<0.05$)', bins=bins2)
     plt.hist(same_ang_sep*180/np.pi, color='k', histtype='step', label='Same ($p>0.05$)', bins=bins2)
-    plt.hist((angular_separations[(angular_separations>1)&(np.isfinite(grid))]*180/np.pi),
+    plt.hist((angular_separations[(angular_separations>0.01)&(np.isfinite(grid))]*180/np.pi),
              color='b', histtype='step', label='Total # of images', bins=bins2)
     plt.legend(loc='upper left')
     plt.xlabel("Angular Separation ($^{\circ}$)")
@@ -430,8 +430,15 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     total_counts,total_edges = np.histogram((angular_separations[(angular_separations>1)&(np.isfinite(grid))]*180/np.pi),
                                             bins=bins2)
 
-    plt.plot(steppify(diff_edges, isX=True), steppify(diff_counts/total_counts), color='r', label='Different ($p<0.05$)')
-    plt.plot(steppify(diff_edges, isX=True), steppify(same_counts/total_counts), color='b', label='Same ($p>0.05$)')
+    xaxis = np.ravel(zip(diff_edges[:-1], diff_edges[1:]))
+    yaxis = np.ravel(zip((diff_counts/total_counts), (diff_counts/total_counts))
+    plt.plot(xaxis, yaxis, drawstyle='steps',
+            color='r', linewidth=2, alpha=0.7,
+            label='Different ($p<0.05$)')
+    yaxis = np.ravel(zip((same_counts/total_counts), (same_counts/total_counts))
+    plt.plot(xaxis, yaxis, drawstyle='steps',
+             color='b', linewidth=2, alpha=0.7,
+             label='Same ($p>0.05$)')
 
     plt.legend(loc='upper left')
     plt.xlabel("Angular Separation ($^{\circ}$)")
