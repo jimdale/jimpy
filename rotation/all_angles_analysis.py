@@ -430,8 +430,8 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     total_counts,total_edges = np.histogram((angular_separations[(angular_separations>1)&(np.isfinite(grid))]*180/np.pi),
                                             bins=bins2)
 
-    pl.plot(steppify(diff_edges, isX=True), steppify(diff_counts/total_counts), color='r', label='Different ($p<0.05$)')
-    pl.plot(steppify(diff_edges, isX=True), steppify(same_counts/total_counts), color='b', label='Same ($p>0.05$)')
+    plt.plot(steppify(diff_edges, isX=True), steppify(diff_counts/total_counts), color='r', label='Different ($p<0.05$)')
+    plt.plot(steppify(diff_edges, isX=True), steppify(same_counts/total_counts), color='b', label='Same ($p>0.05$)')
 
     plt.legend(loc='upper left')
     plt.xlabel("Angular Separation ($^{\circ}$)")
