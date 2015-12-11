@@ -1,4 +1,5 @@
-def imager(fname,xmin,xmax,ymin,ymax,zmin,zmax,logmax,logrange,logmin,ang1,ang2,ang3,iline,coldtemp,hottemp):
+def imager(fname, xmin, xmax, ymin, ymax, zmin, zmax, logmax, logrange, logmin,
+           ang1, ang2, ang3, iline, coldtemp, hottemp):
 
   import numpy
   from numpy import zeros
