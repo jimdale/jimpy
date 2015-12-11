@@ -368,6 +368,8 @@ def analyze(file_list):
     plt.savefig('ks_grid_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
     plt.figure(2,figsize=(8,8))
+    clf()
+    cla()
 
     plt.hist(10**grid_loc.T[grid<0.05], color='r', histtype='step', label='Different ($p<0.05$)')
     plt.hist(10**grid_loc.T[grid>0.05], color='k', histtype='step', label='Same ($p>0.05$)')
@@ -497,20 +499,29 @@ def analyze(file_list):
     ks_ln_nofit = []
 
     for row in cmfxs:
-        pf = plfit.plfit(10**np.array(row), discrete=False, usefortran=True)
-        pf.lognormal()
-        ks_pl.append(pf._ks_prob)
-        ks_ln.append(pf.lognormal_ksP)
+        try:
+            pf = plfit.plfit(10**np.array(row), discrete=False, usefortran=True)
+            pf.lognormal()
+            ks_pl.append(pf._ks_prob)
+            ks_ln.append(pf.lognormal_ksP)
+        except AssertionError:
+            print("There was an error. Skipping a value")
 
-        pf = plfit.plfit(10**np.array(row), xmin=10**0.5, discrete=False, usefortran=True)
-        pf.lognormal()
-        ks_pl_nofit.append(pf._ks_prob)
-        ks_ln_nofit.append(pf.lognormal_ksP)
+        try:
+            pf = plfit.plfit(10**np.array(row), xmin=10**0.5, discrete=False, usefortran=True)
+            pf.lognormal()
+            ks_pl_nofit.append(pf._ks_prob)
+            ks_ln_nofit.append(pf.lognormal_ksP)
+        except AssertionError:
+            print("There was an error. Skipping a value")
 
     plt.figure(2, figsize=(8,8))
     plt.clf()
-    plt.plot(ks_pl, ks_ln, 'bo')
-    plt.plot(ks_pl_nofit, ks_ln_nofit, 'ro')
+    try:
+        plt.plot(ks_pl, ks_ln, 'bo')
+        plt.plot(ks_pl_nofit, ks_ln_nofit, 'ro')
+    except:
+        print("Failed to plot plfits")
 
     # plot cutoffs
     plt.plot([0.05,0.05],[0,1],'k--')
@@ -518,9 +529,14 @@ def analyze(file_list):
     plt.xlabel("Powerlaw KS Probability")
     plt.ylabel("Lognormal KS Probability")
 
-    plt.plot(ks_pl_nofit, ks_pl, 'o')
-    plt.plot([0,1],[0,1],'k--')
-    plt.title("Everything should be above the line")
+    clf()
+    cla()
+    try:
+        plt.plot(ks_pl_nofit, ks_pl, 'o')
+        plt.plot([0,1],[0,1],'k--')
+        plt.title("Everything should be above the line")
+    except:
+        print("Failed to plot plfits")
 
 
     print 'Done!'
