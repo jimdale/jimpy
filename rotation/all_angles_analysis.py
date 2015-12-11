@@ -387,7 +387,7 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
 
     plt.plot((angular_separations*180/np.pi).flat, grid.flat, 'b.')
     plt.plot((180-angular_separations*180/np.pi).flat, grid.flat, 'b.')
-    plt.xlabel("Angular Separation ($^\circ$)")
+    plt.xlabel("Angular Separation (degrees)")
     plt.ylabel("KS Probabilities")
 
     plt.savefig('ks_vs_angsep_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
