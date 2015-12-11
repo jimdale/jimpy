@@ -14,7 +14,7 @@ import string
 
 import matplotlib
 import matplotlib
-matplotlib.use('agg')
+matplotlib.use('Agg')
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -113,6 +113,10 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     print 'Healpix wedges: ',nhppix
 
     healpix_angles = zip(*healpy.pix2ang(nhplevel+1, np.arange(nhppix)))
+    healpix_vectors = zip(*healpy.pix2vec(nhplevel+1, np.arange(nhppix)))
+    angular_separations = np.array([[np.arccos(np.dot(x,y))
+                                     for x in healpix_vectors[:nhppix/2]]
+                                    for y in healpix_vectors[:nhppix/2]])
 
     rad_to_deg=360./(2.*pi)
 
@@ -376,6 +380,31 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     xlabel("$A_V$ where the KS-test was computed")
 
     plt.savefig('ks_location_histograms_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
+
+    plt.figure(2,figsize=(8,8))
+    clf()
+    cla()
+
+    plt.plot((angular_separations*180/np.pi).flat, grid.flat, 'b.')
+    plt.plot((180-angular_separations*180/np.pi).flat, grid.flat, 'b.')
+    plt.xlabel("Angular Separation ($^\circ$)")
+    plt.ylabel("KS Probabilities")
+
+    plt.savefig('ks_vs_angsep_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
+
+    same_ang_sep = np.concatenate([angular_separations[grid>0.05], np.pi-angular_separations[grid>0.05]])
+    diff_ang_sep = np.concatenate([angular_separations[grid<0.05], np.pi-angular_separations[grid<0.05]])
+
+    clf()
+    cla()
+
+    plt.hist(diff_ang_sep*180/np.pi, color='r', histtype='step', label='Different ($p<0.05$)')
+    plt.hist(same_ang_sep*180/np.pi, color='k', histtype='step', label='Same ($p>0.05$)')
+    plt.hist(angular_separations.flat, color='b', histtype='step', label='Total # of images')
+    plt.legend(loc='best')
+    xlabel("Angular Separation")
+
+    plt.savefig('ks_vs_angsep_histograms_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 
     for j in range(nbins):
