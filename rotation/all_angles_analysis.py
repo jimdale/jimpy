@@ -391,10 +391,11 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
 
     plt.savefig('ks_vs_angsep_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
-    same_ang_sep = np.concatenate([angular_separations[(grid>0.05) & (angular_separations > 0.01)],
-                                   np.pi-angular_separations[(grid>0.05) & (angular_separations > 0.01)]])
-    diff_ang_sep = np.concatenate([angular_separations[(grid<0.05) & (angular_separations > 0.01)],
-                                   np.pi-angular_separations[(grid<0.05) & (angular_separations > 0.01)]])
+    ok = (grid!=1.0) & (angular_separations > 1e-4) & (np.isfinite(grid))
+    same_ang_sep = np.concatenate([angular_separations[(grid>0.05) & ok],
+                                   np.pi-angular_separations[(grid>0.05) & ok]])
+    diff_ang_sep = np.concatenate([angular_separations[(grid<0.05) & ok],
+                                   np.pi-angular_separations[(grid<0.05) & ok]])
 
     clf()
     cla()
@@ -402,7 +403,7 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     bins2 = np.linspace(0,90,10)
     plt.hist(diff_ang_sep*180/np.pi, color='r', histtype='step', label='Different ($p<0.05$)', bins=bins2)
     plt.hist(same_ang_sep*180/np.pi, color='k', histtype='step', label='Same ($p>0.05$)', bins=bins2)
-    plt.hist((angular_separations[(angular_separations>0.01)&(np.isfinite(grid))]*180/np.pi),
+    plt.hist((angular_separations[ok]*180/np.pi),
              color='b', histtype='step', label='Total # of images', bins=bins2)
     plt.legend(loc='upper left')
     plt.xlabel("Angular Separation ($^{\circ}$)")
@@ -414,15 +415,17 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     cla()
     diff_counts,diff_edges = np.histogram(diff_ang_sep*180/np.pi, bins=bins2)
     same_counts,same_edges = np.histogram(same_ang_sep*180/np.pi, bins=bins2)
-    total_counts,total_edges = np.histogram((angular_separations[(angular_separations>1)&(np.isfinite(grid))]*180/np.pi),
+    total_counts_a = diff_counts+same_counts
+    total_counts,total_edges = np.histogram(np.concatenate([(angular_separations[ok]*180/np.pi),
+                                                            180-(angular_separations[ok]*180/np.pi)]),
                                             bins=bins2)
 
     xaxis = np.ravel(zip(diff_edges[:-1], diff_edges[1:]))
-    yaxis = np.ravel(zip((diff_counts/total_counts), (diff_counts/total_counts)))
+    yaxis = np.ravel(zip((diff_counts/total_counts), (diff_counts.astype('float')/total_counts)))
     plt.plot(xaxis, yaxis, drawstyle='steps',
             color='r', linewidth=2, alpha=0.7,
             label='Different ($p<0.05$)')
-    yaxis = np.ravel(zip((same_counts/total_counts), (same_counts/total_counts)))
+    yaxis = np.ravel(zip((same_counts/total_counts), (same_counts.astype('float')/total_counts)))
     plt.plot(xaxis, yaxis, drawstyle='steps',
              color='b', linewidth=2, alpha=0.7,
              label='Same ($p>0.05$)')
@@ -433,6 +436,8 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     plt.xlim(0,90)
 
     plt.savefig('ks_vs_angsep_normalized_histograms_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
+    assert all(total_counts_a==total_counts)
+    import ipdb; ipdb.set_trace()
 
 
     for j in range(nbins):
