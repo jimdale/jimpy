@@ -392,8 +392,8 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
 
     plt.savefig('ks_vs_angsep_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
-    same_ang_sep = np.concatenate([angular_separations[grid>0.05 & angular_separations > 0], np.pi-angular_separations[grid>0.05 & angular_separations > 0]])
-    diff_ang_sep = np.concatenate([angular_separations[grid<0.05 & angular_separations > 0], np.pi-angular_separations[grid<0.05 & angular_separations > 0]])
+    same_ang_sep = np.concatenate([angular_separations[(grid>0.05) & (angular_separations > 0)], np.pi-angular_separations[(grid>0.05) & (angular_separations > 0)]])
+    diff_ang_sep = np.concatenate([angular_separations[(grid<0.05) & (angular_separations > 0)], np.pi-angular_separations[(grid<0.05) & (angular_separations > 0)]])
 
     clf()
     cla()
