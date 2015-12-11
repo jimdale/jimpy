@@ -97,6 +97,7 @@ c it is just the usual 3-d kernel
              if (first_thing.ne.690706) then
                  goto 20
              endif
+             rewind(11)
          endif
 
 c

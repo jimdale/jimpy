@@ -173,7 +173,7 @@ def analyze(file_list):
     #
     ##########################################################################################
 
-    fig=plt.figure(figsize=fsize)
+    fig=plt.figure(1,figsize=fsize)
 
     set_cmap('hot')
 
@@ -205,8 +205,6 @@ def analyze(file_list):
 
     plt.savefig('moment0_angles_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
-    clf()
-    cla()
 
     ##########################################################################################
     #
@@ -214,7 +212,9 @@ def analyze(file_list):
     #
     ##########################################################################################
 
-    fig=plt.figure(figsize=fsize)
+    fig=plt.figure(1,figsize=fsize)
+    clf()
+    cla()
 
     set_cmap('rainbow')
 
@@ -240,8 +240,6 @@ def analyze(file_list):
     cb.set_label('Line-of-sight velocity (km s$^{-1}$)')
     plt.savefig('moment1_angles_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
-    clf()
-    cla()
 
     ##########################################################################################
     #
@@ -249,7 +247,9 @@ def analyze(file_list):
     #
     ##########################################################################################
 
-    fig=plt.figure(figsize=(8,8))
+    fig=plt.figure(2,figsize=(8,8))
+    clf()
+    cla()
 
     for i in range(nmaps):
             pdf=ravel(moment0maps[i])
@@ -293,9 +293,9 @@ def analyze(file_list):
 
     # perform KS tests of all against all
 
+    fig=plt.figure(2,figsize=(8,8))
     clf()
     cla()
-    fig=plt.figure(figsize=(8,8))
 
     for i in range(nmaps):
             for j in range(nmaps):
@@ -309,9 +309,9 @@ def analyze(file_list):
 
     plt.savefig('ks_stats_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
+    fig=plt.figure(2,figsize=(8,8))
     clf()
     cla()
-    fig=plt.figure(figsize=(8,8))
 
     for i in range(nmaps):
             for j in range(nmaps):
@@ -324,8 +324,6 @@ def analyze(file_list):
 
     plt.savefig('ks_p-values_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
-    clf()
-    cla()
 
 
     def ks_2samp_loc(data1,data2):
@@ -345,7 +343,9 @@ def analyze(file_list):
         return (d, prob, data_all[d_loc])
 
 
-    fig=plt.figure(figsize=(8,8))
+    fig=plt.figure(2,figsize=(8,8))
+    clf()
+    cla()
 
     grid = zeros((nmaps,nmaps))*np.nan
     grid_loc = zeros((nmaps,nmaps))*np.nan
@@ -367,10 +367,8 @@ def analyze(file_list):
 
     plt.savefig('ks_grid_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
-    plt.figure(figsize=(8,8))
+    plt.figure(2,figsize=(8,8))
 
-    clf()
-    cla()
     plt.hist(10**grid_loc.T[grid<0.05], color='r', histtype='step', label='Different ($p<0.05$)')
     plt.hist(10**grid_loc.T[grid>0.05], color='k', histtype='step', label='Same ($p>0.05$)')
     plt.legend(loc='best')
@@ -411,6 +409,9 @@ def analyze(file_list):
     meanpdf=[log10(m) for m in meanpdf]
     low=[log10(l) for l in low]
 
+    plt.figure(2, figsize=(8,8))
+    clf()
+    cla()
 
     #plt.plot(bins,high,'r--')
     plt.plot(bns,meanpdf,'b-')
@@ -431,7 +432,9 @@ def analyze(file_list):
     #
     ##########################################################################################
 
-    fig=plt.figure(figsize=fsize)
+    fig=plt.figure(1,figsize=fsize)
+    clf()
+    cla()
 
     nplot=0
     for i in range(nmaps):
@@ -452,7 +455,7 @@ def analyze(file_list):
     #
     ##########################################################################################
 
-    fig=plt.figure(figsize=fsize)
+    fig=plt.figure(1,figsize=fsize)
 
     nplot=0
     for i in range(nmaps):
@@ -471,7 +474,7 @@ def analyze(file_list):
     plt.savefig('pdfs_angles'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 
-    fig=plt.figure(figsize=fsize)
+    fig=plt.figure(1,figsize=fsize)
 
     nplot=0
     for i in range(nmaps):
@@ -504,6 +507,7 @@ def analyze(file_list):
         ks_pl_nofit.append(pf._ks_prob)
         ks_ln_nofit.append(pf.lognormal_ksP)
 
+    plt.figure(2, figsize=(8,8))
     plt.clf()
     plt.plot(ks_pl, ks_ln, 'bo')
     plt.plot(ks_pl_nofit, ks_ln_nofit, 'ro')
