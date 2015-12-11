@@ -418,11 +418,11 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
                                             bins=bins2)
 
     xaxis = np.ravel(zip(diff_edges[:-1], diff_edges[1:]))
-    yaxis = np.ravel(zip((diff_counts/total_counts), (diff_counts/total_counts))
+    yaxis = np.ravel(zip((diff_counts/total_counts), (diff_counts/total_counts)))
     plt.plot(xaxis, yaxis, drawstyle='steps',
             color='r', linewidth=2, alpha=0.7,
             label='Different ($p<0.05$)')
-    yaxis = np.ravel(zip((same_counts/total_counts), (same_counts/total_counts))
+    yaxis = np.ravel(zip((same_counts/total_counts), (same_counts/total_counts)))
     plt.plot(xaxis, yaxis, drawstyle='steps',
              color='b', linewidth=2, alpha=0.7,
              label='Same ($p>0.05$)')
