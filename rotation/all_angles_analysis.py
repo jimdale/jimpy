@@ -6,7 +6,8 @@ import sys
 import numpy
 from numpy import *
 
-from scipy.stats import ks_2samp
+from scipy.stats import ks_2samp,ksone
+from scipy.stats import distributions
 
 
 import healpy
@@ -26,13 +27,12 @@ rc('font',**{'family':'serif','serif':['Times New Roman'],'size':12})
 rc('text',usetex=True)
 rc('patch',antialiased=False)
 
-from scipy.stats import distributions
 
 # https://github.com/keflavich/plfit
 import plfit
+import powerlaw
 
 import moment_maps_rotate
-
 
 def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
             zmax=100., limitsmean=[0.,2,-2.,6.], iline=100):
@@ -392,10 +392,11 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
 
     plt.savefig('ks_vs_angsep_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
-    same_ang_sep = np.concatenate([angular_separations[(grid>0.05) & (angular_separations > 0)],
-                                   np.pi-angular_separations[(grid>0.05) & (angular_separations > 0)]])
-    diff_ang_sep = np.concatenate([angular_separations[(grid<0.05) & (angular_separations > 0)],
-                                   np.pi-angular_separations[(grid<0.05) & (angular_separations > 0)]])
+    ok = (grid!=1.0) & (angular_separations > 1e-4) & (np.isfinite(grid))
+    same_ang_sep = np.concatenate([angular_separations[(grid>0.05) & ok],
+                                   np.pi-angular_separations[(grid>0.05) & ok]])
+    diff_ang_sep = np.concatenate([angular_separations[(grid<0.05) & ok],
+                                   np.pi-angular_separations[(grid<0.05) & ok]])
 
     clf()
     cla()
@@ -403,13 +404,40 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     bins2 = np.linspace(0,90,10)
     plt.hist(diff_ang_sep*180/np.pi, color='r', histtype='step', label='Different ($p<0.05$)', bins=bins2)
     plt.hist(same_ang_sep*180/np.pi, color='k', histtype='step', label='Same ($p>0.05$)', bins=bins2)
-    plt.hist((angular_separations[(angular_separations>1)&(np.isfinite(grid))]*180/np.pi),
+    plt.hist((angular_separations[ok]*180/np.pi),
              color='b', histtype='step', label='Total # of images', bins=bins2)
     plt.legend(loc='upper left')
     plt.xlabel("Angular Separation ($^{\circ}$)")
     plt.xlim(0,90)
 
     plt.savefig('ks_vs_angsep_histograms_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
+
+    clf()
+    cla()
+    diff_counts,diff_edges = np.histogram(diff_ang_sep*180/np.pi, bins=bins2)
+    same_counts,same_edges = np.histogram(same_ang_sep*180/np.pi, bins=bins2)
+    total_counts_a = diff_counts+same_counts
+    total_counts,total_edges = np.histogram(np.concatenate([(angular_separations[ok]*180/np.pi),
+                                                            180-(angular_separations[ok]*180/np.pi)]),
+                                            bins=bins2)
+
+    xaxis = np.ravel(zip(diff_edges[:-1], diff_edges[1:]))
+    yaxis = np.ravel(zip((diff_counts/total_counts), (diff_counts.astype('float')/total_counts)))
+    plt.plot(xaxis, yaxis, drawstyle='steps',
+            color='r', linewidth=2, alpha=0.7,
+            label='Different ($p<0.05$)')
+    yaxis = np.ravel(zip((same_counts/total_counts), (same_counts.astype('float')/total_counts)))
+    plt.plot(xaxis, yaxis, drawstyle='steps',
+             color='b', linewidth=2, alpha=0.7,
+             label='Same ($p>0.05$)')
+
+    plt.legend(loc='upper left')
+    plt.xlabel("Angular Separation ($^{\circ}$)")
+    plt.ylabel("Fraction of images")
+    plt.xlim(0,90)
+
+    plt.savefig('ks_vs_angsep_normalized_histograms_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
+    assert all(total_counts_a==total_counts)
 
 
     for j in range(nbins):
@@ -534,46 +562,66 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
     ks_ln = []
     ks_pl_nofit = []
     ks_ln_nofit = []
+    alpha_fit = []
+    alpha_nofit = []
 
     for row in cmfxs:
-        try:
-            pf = plfit.plfit(10**np.array(row), discrete=False, usefortran=True)
-            pf.lognormal()
-            ks_pl.append(pf._ks_prob)
-            ks_ln.append(pf.lognormal_ksP)
-        except AssertionError:
-            print("There was an error. Skipping a value")
+        data = 10**np.array(row)
+        pf = powerlaw.Fit(data)
+        ks = ksone.sf(pf.D, np.count_nonzero(data >= pf.xmin))
+        R,p = pf.distribution_compare('power_law', 'lognormal')
+        ks_pl.append(ks)
+        ks = ksone.sf(pf.lognormal.D, np.count_nonzero(data >= pf.xmin))
+        ks_ln.append(ks)
+        alpha_fit.append(pf.alpha)
 
-        try:
-            pf = plfit.plfit(10**np.array(row), xmin=10**0.5, discrete=False, usefortran=True)
-            pf.lognormal()
-            ks_pl_nofit.append(pf._ks_prob)
-            ks_ln_nofit.append(pf.lognormal_ksP)
-        except AssertionError:
-            print("There was an error. Skipping a value")
+        pf = powerlaw.Fit(data, xmin=10**0.5)
+        ks = ksone.sf(pf.D, np.count_nonzero(data >= pf.xmin))
+        ks_pl_nofit.append(ks)
+        R,p = pf.distribution_compare('power_law', 'lognormal')
+        ks = ksone.sf(pf.lognormal.D, np.count_nonzero(data >= pf.xmin))
+        ks_ln_nofit.append(ks)
+        alpha_nofit.append(pf.alpha)
 
     plt.figure(2, figsize=(8,8))
     plt.clf()
     try:
-        plt.plot(ks_pl, ks_ln, 'bo')
-        plt.plot(ks_pl_nofit, ks_ln_nofit, 'ro')
+        plt.plot(ks_pl, ks_ln, 'bo', label='Fitted $A_{V,min}$')
+        plt.plot(ks_pl_nofit, ks_ln_nofit, 'ro', label="$A_{v,min}=3.2$")
     except:
         print("Failed to plot plfits")
 
     # plot cutoffs
     plt.plot([0.05,0.05],[0,1],'k--')
-    plt.plot([0,1],[0.05,0.05],'k--')    
+    plt.plot([0,1],[0.05,0.05],'k--')
     plt.xlabel("Powerlaw KS Probability")
     plt.ylabel("Lognormal KS Probability")
+    plt.legend(loc='best')
+    plt.savefig('powerlaw_vs_lognormal_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
+
 
     clf()
     cla()
     try:
         plt.plot(ks_pl_nofit, ks_pl, 'o')
         plt.plot([0,1],[0,1],'k--')
+        plt.xlabel("Powerlaw KS no-fit")
+        plt.ylabel("Powerlaw KS fitted")
         plt.title("Everything should be above the line")
     except:
         print("Failed to plot plfits")
+
+    plt.savefig('diagnostic_powerlaw_vs_lognormal_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
+
+
+    clf()
+    cla()
+    plt.plot(ks_ln_nofit, alpha_nofit, 'ro', label="$A_{v,min}=3.2$")
+    plt.plot(ks_pl, alpha_fit, 'bo', label='Fitted $A_{V,min}$')
+    plt.xlabel("Powerlaw KS")
+    plt.ylabel("Powerlaw $\\alpha$")
+    plt.legend(loc='best')
+    plt.savefig('powerlaw_alpha_vs_ks_'+os.path.split(fname)[-1]+'.png',dpi=300,bbox_inches='tight')
 
 
     print 'Done!'
