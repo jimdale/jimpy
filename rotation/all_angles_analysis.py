@@ -628,6 +628,8 @@ def analyze(fname, xmin=-20., xmax=20., ymin=-20., ymax=20., zmin=-100.,
 
 if __name__ == "__main__":
 
+    print("Everything is up to date: Jan 15, 2016")
+
     for ii in range(3):
         plt.close(ii)
 
